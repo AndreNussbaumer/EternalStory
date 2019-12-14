@@ -9,13 +9,15 @@
     <header>
       <h1> The Eternal Story </h1>
     </header>
-    <div id="thestory">
-      <p id="story">The Eternal Story has no start and no ending, it was here all along. It spans across the past, the present and the future, from all the different galaxies of our minds,
-        the forests in our bodies and the oceans of our eyes. </p>
-    </div>
+    <form action="/comments" method="POST">
+      <div id="thestory">
+        <p id="story">The Eternal Story has no start and no ending, it was here all along. It spans across the past, the present and the future, from all the different galaxies of our minds,
+          the forests in our bodies and the oceans of our eyes. </p>
+      </div>
           <!-- Viewers can add bits to the story! -->
-      <input type="text" id="text" placeholder="Continue the Story...">
-      <button onclick="addStory()">Post</button>
+      <input type="text" name="comment" placeholder="Continue the Story...">
+      <input type="submit" value="Submit" />
+    </form>
     <p>
       <h2>Share the story!</h2>
     </p>
