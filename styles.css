@@ -1,0 +1,21 @@
+body {
+  text-align: center;
+  background-color: #F1F0F0;
+}
+
+h1 {
+  padding: 40px;
+}
+
+p {
+  padding: 10px;
+}
+
+header {
+  padding: 40px;
+}
+
+#social {
+  padding-top: 80px;
+  padding-bottom: 30px;
+}

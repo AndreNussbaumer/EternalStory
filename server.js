@@ -1,45 +1,77 @@
-const express = require('express');
-const app = express();
-const sqlite3 = require('sqlite3');
-const db = new sqlite3.Database('db/comments.db');
-const bodyParser = require('body-parser');
+const http = require('http');
+const fs = require('fs');
+const con = require("./DBconnection")
 
-app.use(express.static(__dirname + '/../Eternal Story'));
-app.use(bodyParser.urlencoded({extended: false}));
+const hostname = '127.0.0.1'
+const port = "3000"
 
-app.get('/', function(request, response){
-  response.send('Hello, world');
+const server = http.createServer((req, res) => {
+  if (req.method == 'GET' && req.url == '/')
+  {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html');
+    fs.createReadStream('./index.html').pipe(res);
+  }
+
+  else if (req.method == 'GET' && req.url == '/styles.css')
+  {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/css');
+    fs.createReadStream('./styles.css').pipe(res);
+  }
+
+  else if (req.method == 'GET' && req.url == '/home')
+  {
+    res.statusCode == 200;
+    res.setHeader('Content-Type', 'application/json');
+
+    var conn = con.getConnection();
+
+    conn.query('SELECT * FROM thestory.comment', function(error, results, fields){
+      if(error) throw error;
+
+      var story = JSON.stringify(results);
+      res.end(story);
+
+    });
+
+    conn.end();
+  }
+
+
+  else if(req.method == "POST" && req.url == "/insert")
+  {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'text/plain');
+
+      var content = '';
+      req.on('data', function(data){
+          content += data;
+
+          var obj = JSON.parse(content);
+          console.log(content);
+
+          console.log("The story is: "+ obj.message);
+          var conn = con.getConnection();
+
+          conn.query('INSERT INTO thestory.comment (comment.story)',[obj.message], function(error, results, fields){
+          if(error) throw error;
+          console.log("Success!");
+      });
+
+      conn.end();
+      res.end("Success!");
+      });
+  }
+
+  else if (req.method == 'GET' && req.url == '/story.js')
+  {
+    res.writeHead(200, {"Content-Type":"text/javascript"});
+    fs.createReadStream("./story.js").pipe(res);
+  }
+
 });
 
-app.get('/comments', function(request, response){
-  console.log('GET request received at /comments');
-  db.all('SELECT * FROM comments', function(err, rows){
-    if(err) {
-      console.log("Error: " + err);
-    }
-    else {
-      response.send(rows);
-    }
-  })
-});
-
-app.post('/comments', function(request, response){
-  console.log('POST request received at /comments');
-  db.run('INSERT INTO comments VALUES (?)', [request.body.comment], function(err){
-    if(err){
-      console.log("Error: " + err);
-    }
-    else{
-      response.status(200).redirect('index.html');
-    }
-  })
-})
-
-app.get("/comments.db",(req, res) => {
-    res.sendFile(__dirname + "/index.html");
-});
-
-
-app.listen(3000, function(){
-  console.log('Server is running');
+server.listen(port, hostname, () =>{
+  console.log('Server running at port 3000')
 });
